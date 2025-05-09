@@ -16,14 +16,9 @@ return new class extends Migration
             $table->timestamps();
             $table->string("title");
 
-            $table->unsignedBigInteger("author_id");
-            $table->unsignedBigInteger("category_id");
-            $table->unsignedBigInteger("publisher_id");
-
-            
-            $table->foreign("author_id")->references("id")->on("users")->onDelete("cascade");
-            $table->foreign("category_id")->references("id")->on("users")->onDelete("cascade");
-            $table->foreign("publisher_id")->references("id")->on("users")->onDelete("cascade");
+            $table->foreignId("author_id")->onDelete("cascade");
+            $table->foreignId("category_id")->onDelete("cascade");
+            $table->foreignId("publisher_id")->onDelete("cascade");
         });
     }
 
