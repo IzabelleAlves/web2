@@ -1,15 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HomeController;
 
+// Rota da página inicial
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Rotas de autenticação
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Rota da dashboard
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Rota para o CRUD de categorias
+Route::resource('categories', CategoryController::class);
