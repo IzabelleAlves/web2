@@ -33,9 +33,15 @@
                     <td>{{ $book->id }}</td>
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author->name }}</td>
-                    <td>
-    <img src="{{ $book->cover ? asset('storage/' . $book->cover) : asset('images/default-cover.jpg') }}" alt="Capa" width="60">
+
+<td>
+    @if($book->cover && file_exists(public_path('storage/' . $book->cover)))
+        <img src="{{ asset('storage/' . $book->cover) }}" alt="Capa" width="50">
+    @else
+        <img src="{{ asset('images/default-cover.jpg') }}" alt="Sem capa" width="50">
+    @endif
 </td>
+
 
                     <td>
                         <!-- Botão de Visualizar -->
