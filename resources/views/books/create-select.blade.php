@@ -4,8 +4,9 @@
 <div class="container">
     <h1 class="my-4">Adicionar Livro (Com Select)</h1>
 
-    <form action="{{ route('books.store.select') }}" method="POST">
+    <form action="{{ route('books.store.select') }}" method="POST" enctype="multipart/form-data">
         @csrf
+
         <div class="mb-3">
             <label for="title" class="form-label">Título</label>
             <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" required>
@@ -61,8 +62,17 @@
             @enderror
         </div>
 
+        <div class="mb-3">
+            <label for="cover" class="form-label">Imagem de Capa (opcional)</label>
+            <input type="file" class="form-control @error('cover') is-invalid @enderror" id="cover" name="cover" accept="image/*">
+            @error('cover')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+
         <button type="submit" class="btn btn-success">Salvar</button>
     </form>
 </div>
 @endsection
-

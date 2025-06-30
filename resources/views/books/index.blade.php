@@ -23,6 +23,7 @@
                 <th>ID</th>
                 <th>Título</th>
                 <th>Autor</th>
+                <th>Capa</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -32,6 +33,10 @@
                     <td>{{ $book->id }}</td>
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author->name }}</td>
+                    <td>
+    <img src="{{ $book->cover ? asset('storage/' . $book->cover) : asset('images/default-cover.jpg') }}" alt="Capa" width="60">
+</td>
+
                     <td>
                         <!-- Botão de Visualizar -->
                         <a href="{{ route('books.show', $book->id) }}" class="btn btn-info btn-sm">
