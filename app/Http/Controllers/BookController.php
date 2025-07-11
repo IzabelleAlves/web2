@@ -20,6 +20,7 @@ class BookController extends Controller
     // Listar livros com paginação e eager loading do autor
     public function index()
     {
+        // adicionar o order by
         $books = Book::with('author')->paginate(20);
 
         return view('books.index', compact('books'));
@@ -89,11 +90,13 @@ class BookController extends Controller
             'category_id'  => 'required|exists:categories,id',
             'cover'        => 'nullable|image|max:2048',
         ]);
-
+        $path = '';
         if ($request->hasFile('cover')) {
-            $data['cover'] = $request->file('cover')->store('book_covers', 'public');
+            $path = $request->file('cover')->store('book_covers', 'public');
         }
 
+        // dd($path);
+        $data['cover'] =  $path;
         Book::create($data);
 
         return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
