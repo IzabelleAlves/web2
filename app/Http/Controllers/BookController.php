@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Author;
@@ -20,9 +21,7 @@ class BookController extends Controller
     // Listar livros com paginação e eager loading do autor
     public function index()
     {
-        // adicionar o order by
         $books = Book::with('author')->paginate(20);
-
         return view('books.index', compact('books'));
     }
 
@@ -30,7 +29,7 @@ class BookController extends Controller
     public function edit(Book $book)
     {
         $publishers = Publisher::all();
-        $authors    = Author::all();
+        $authors = Author::all();
         $categories = Category::all();
 
         return view('books.edit', compact('book', 'publishers', 'authors', 'categories'));
@@ -47,12 +46,12 @@ class BookController extends Controller
             'cover'        => 'nullable|image|max:2048',
         ]);
 
+        // Substituir capa se uma nova for enviada
         if ($request->hasFile('cover')) {
-            // Deleta a imagem antiga se existir
             if ($book->cover && Storage::disk('public')->exists($book->cover)) {
                 Storage::disk('public')->delete($book->cover);
             }
-            // Salva a nova imagem
+
             $data['cover'] = $request->file('cover')->store('book_covers', 'public');
         }
 
@@ -61,7 +60,19 @@ class BookController extends Controller
         return redirect()->route('books.index')->with('success', 'Livro atualizado com sucesso.');
     }
 
-    // Mostrar detalhes do livro + formulário de empréstimo (com usuários)
+    // Novo: Remover apenas a capa do livro (sem deletar o livro)
+    public function removeCover(Book $book)
+    {
+        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+            Storage::disk('public')->delete($book->cover);
+            $book->cover = null;
+            $book->save();
+        }
+
+        return redirect()->back()->with('success', 'Capa removida com sucesso.');
+    }
+
+    // Mostrar detalhes do livro + formulário de empréstimo
     public function show(Book $book)
     {
         $book->load(['author', 'publisher', 'category']);
@@ -74,7 +85,7 @@ class BookController extends Controller
     public function createWithSelect()
     {
         $publishers = Publisher::all();
-        $authors    = Author::all();
+        $authors = Author::all();
         $categories = Category::all();
 
         return view('books.create-select', compact('publishers', 'authors', 'categories'));
@@ -90,13 +101,11 @@ class BookController extends Controller
             'category_id'  => 'required|exists:categories,id',
             'cover'        => 'nullable|image|max:2048',
         ]);
-        $path = '';
-        if ($request->hasFile('cover')) {
-            $path = $request->file('cover')->store('book_covers', 'public');
-        }
 
-        // dd($path);
-        $data['cover'] =  $path;
+        $data['cover'] = $request->hasFile('cover')
+            ? $request->file('cover')->store('book_covers', 'public')
+            : null;
+
         Book::create($data);
 
         return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');

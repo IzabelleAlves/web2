@@ -17,7 +17,7 @@ Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowi
 // Rota para registrar a devolução
 Route::patch('/borrowings/{borrowing}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
 
-
+Route::delete('/books/{book}/remove-cover', [BookController::class, 'removeCover'])->name('books.removeCover');
 
 Route::resource('users', UserController::class)->except(['create', 'store', 'destroy']);
 

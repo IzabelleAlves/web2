@@ -4,9 +4,10 @@
 <div class="container">
     <h1 class="my-4">Editar Livro</h1>
 
-    <form action="{{ route('books.update', $book) }}" method="POST">
+    <form action="{{ route('books.update', $book) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
         <div class="mb-3">
             <label for="title" class="form-label">Título</label>
             <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $book->title) }}" required>
@@ -68,8 +69,36 @@
             @enderror
         </div>
 
+        {{-- Mostra a capa atual, se houver --}}
+        @if($book->cover_image)
+            <div class="mb-3">
+                <label class="form-label">Capa atual:</label><br>
+                <img src="{{ asset('storage/' . $book->cover_image) }}" alt="Capa do livro" style="max-height: 200px;">
+            </div>
+        @endif
+
+        {{-- Upload de nova capa --}}
+        <div class="mb-3">
+            <label for="cover_image" class="form-label">Nova capa (opcional)</label>
+            <input type="file" class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image" accept="image/*">
+            @error('cover_image')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+
         <button type="submit" class="btn btn-success">Atualizar</button>
         <a href="{{ route('books.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>
+
+    {{-- Botão para remover capa, se houver --}}
+    @if($book->cover_image)
+        <form action="{{ route('books.removeCover', $book->id) }}" method="POST" class="mt-3">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Remover capa</button>
+        </form>
+    @endif
 </div>
 @endsection
