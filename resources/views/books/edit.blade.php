@@ -70,18 +70,18 @@
         </div>
 
         {{-- Mostra a capa atual, se houver --}}
-        @if($book->cover_image)
+        @if($book->cover)
             <div class="mb-3">
                 <label class="form-label">Capa atual:</label><br>
-                <img src="{{ asset('storage/' . $book->cover_image) }}" alt="Capa do livro" style="max-height: 200px;">
+                <img src="{{ asset('storage/' . $book->cover) }}" alt="Capa do livro" style="max-height: 200px;">
             </div>
         @endif
 
         {{-- Upload de nova capa --}}
         <div class="mb-3">
-            <label for="cover_image" class="form-label">Nova capa (opcional)</label>
-            <input type="file" class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image" accept="image/*">
-            @error('cover_image')
+            <label for="cover" class="form-label">Nova capa (opcional)</label>
+            <input type="file" class="form-control @error('cover') is-invalid @enderror" id="cover" name="cover" accept="image/*">
+            @error('cover')
                 <div class="invalid-feedback">
                     {{ $message }}
                 </div>
@@ -93,7 +93,7 @@
     </form>
 
     {{-- Botão para remover capa, se houver --}}
-    @if($book->cover_image)
+    @if($book->cover)
         <form action="{{ route('books.removeCover', $book->id) }}" method="POST" class="mt-3">
             @csrf
             @method('DELETE')
