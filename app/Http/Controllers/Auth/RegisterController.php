@@ -67,6 +67,34 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => 'cliente', 
         ]);
     }
+
+    public function edit(User $user)
+{
+    // só admin pode editar papéis
+    if (auth()->user()->role !== 'admin') {
+        abort(403, 'Ação não autorizada.');
+    }
+
+    return view('users.edit', compact('user'));
+}
+
+public function update(Request $request, User $user)
+{
+    if (auth()->user()->role !== 'admin') {
+        abort(403, 'Ação não autorizada.');
+    }
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'role' => 'required|in:admin,bibliotecario,cliente',
+    ]);
+
+    $user->update($request->only('name', 'email', 'role'));
+
+    return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
+}
 }
