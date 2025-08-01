@@ -5,21 +5,31 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string  $roles
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-public function handle($request, Closure $next, ...$roles)
-{
-    if (!in_array(auth()->user()->role, $roles)) {
-        abort(403, 'Acesso não autorizado');
+    public function handle(Request $request, Closure $next, $roles): Response
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+        $rolesArray = explode(',', $roles);
+
+        if (!in_array($user->role, $rolesArray)) {
+            abort(403, 'Acesso negado');
+        }
+
+        return $next($request);
     }
-
-    return $next($request);
-}
-
 }
