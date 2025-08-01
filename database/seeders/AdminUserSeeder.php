@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder
 {
@@ -16,7 +18,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'admin@biblioteca.com'],
             [
                 'name' => 'Administrador',
-                'password' => Hash::make('admin123'), // você pode trocar por outra senha
+                'password' => Hash::make('admin123'), 
                 'role' => 'admin',
             ]
         ); 
