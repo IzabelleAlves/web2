@@ -7,7 +7,6 @@ use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BorrowingController;
-use App\Http\Controllers\DebitController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Auth;
 
