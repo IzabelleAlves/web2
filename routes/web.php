@@ -7,6 +7,7 @@ use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BorrowingController;
+use App\Http\Controllers\DebitController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,9 +15,8 @@ Route::middleware(['auth', CheckRole::class . ':admin,bibliotecario'])->group(fu
     Route::post('/books/{book}/borrow', [BorrowingController::class, 'store'])->name('books.borrow');
     Route::patch('/borrowings/{borrowing}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
 
-    // Rotas para controle de débitos (bibliotecário)
-    Route::get('/debitos', [CheckRole::class, 'index'])->name('debitos.index');
-    Route::post('/debitos/{user}/clear', [CheckRole::class, 'clear'])->name('debitos.clear');
+    Route::get('/debits', [DebitController::class, 'index'])->name('debits.index');
+    Route::post('/debits/{user}/clear', [DebitController::class, 'clear'])->name('debits.clear');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -26,6 +26,8 @@ Route::middleware(['auth'])->group(function () {
 // Usuários (apenas admin pode visualizar, editar, listar usuários)
 Route::middleware(['auth', CheckRole::class . ':admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['create', 'store', 'destroy']);
+    Route::get('/users/debits', [UserController::class, 'listDebtors'])->name('users.debits');
+    Route::post('/users/{user}/clear-debit', [UserController::class, 'clearDebit'])->name('users.clear.debit');
 });
 
 Route::middleware('auth')->get('/books', [BookController::class, 'index'])->name('books.index');
@@ -38,7 +40,6 @@ Route::middleware(['auth', CheckRole::class . ':admin,bibliotecario'])->group(fu
     Route::post('/books/create-select', [BookController::class, 'storeWithSelect'])->name('books.store.select');
 
     Route::resource('books', BookController::class)->except(['create', 'store', 'show', 'index']);
-
     Route::resource('authors', AuthorController::class)->except(['show']);
     Route::resource('publishers', PublisherController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
@@ -56,6 +57,7 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+
 Route::delete('/books/{book}/remove-cover', [BookController::class, 'removeCover'])->name('books.removeCover');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

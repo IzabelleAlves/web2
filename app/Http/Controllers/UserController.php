@@ -37,6 +37,20 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso.');
     }
 
+    public function listDebtors()
+{
+    $users = User::where('debit', '>', 0)->get();
+    return view('users.debits', compact('users'));
+}
+
+public function clearDebit(User $user)
+{
+    $user->debit = 0;
+    $user->save();
+
+    return redirect()->back()->with('success', 'Débito zerado com sucesso.');
+}
+
     
 }
 
