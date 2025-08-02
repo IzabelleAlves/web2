@@ -31,7 +31,8 @@ class BorrowingController extends Controller
         // Verifica se o usuário possui débito pendente
         if ($user->debit > 0) {
             return redirect()->route('books.show', $book)
-                ->with('error', 'Empréstimo não realizado. Este usuário possui débito pendente de R$ ' . number_format($user->debit, 2, ',', '.'));
+                ->with('error', 'Empréstimo não realizado. Este usuário possui débito pendente de R$ ' . number_format((float) $user->debit, 2, ',', '.'));
+
         }
 
         // Verifica se o usuário já tem 5 empréstimos em aberto

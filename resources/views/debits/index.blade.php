@@ -1,21 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1>Lista de Débitos</h1>
+<div class="container">
+    <h1>Débitos por Atraso</h1>
 
-        <!-- Exemplo simples: -->
-        <p>Aqui você pode listar os débitos dos usuários...</p>
+    @php
+        $hasDebits = false;
+    @endphp
 
-        {{-- Você pode usar dados passados pelo controller aqui --}}
-        @if(isset($debits) && count($debits) > 0)
-            <ul>
-                @foreach($debits as $debit)
-                    <li>{{ $debit->user->name }} - R$ {{ number_format($debit->amount, 2, ',', '.') }}</li>
-                @endforeach
-            </ul>
-        @else
-            <p>Não há débitos para exibir.</p>
-        @endif
-    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Usuário</th>
+                <th>Livro</th>
+                <th>Data de Devolução</th>
+                <th>Multa (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($borrowings as $borrowing)
+                @if($borrowing->fine > 0)
+                    @php $hasDebits = true; @endphp
+                    <tr>
+                        <td>{{ $borrowing->user->name }}</td>
+                        <td>{{ $borrowing->book->title }}</td>
+                        <td>{{ \Carbon\Carbon::parse($borrowing->due_date)->format('d/m/Y') }}</td>
+                        <td>{{ number_format($borrowing->fine, 2, ',', '.') }}</td>
+                    </tr>
+                @endif
+            @endforeach
+        </tbody>
+    </table>
+
+    @if(!$hasDebits)
+        <p>Não há débitos no momento.</p>
+    @endif
+</div>
 @endsection
