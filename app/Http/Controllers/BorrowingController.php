@@ -12,20 +12,32 @@ use App\Models\User;
 class BorrowingController extends Controller
 {
 
-    public function store(Request $request, Book $book)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
+public function store(Request $request, Book $book)
+{
+    $request->validate([
+        'user_id' => 'required|exists:users,id',
+    ]);
 
-        Borrowing::create([
-            'user_id'     => $request->user_id,
-            'book_id'     => $book->id,
-            'borrowed_at' => now(),
-        ]);
+    // Verifica se já existe um empréstimo em aberto para este livro
+    $emprestimoEmAberto = Borrowing::where('book_id', $book->id)
+        ->whereNull('returned_at')
+        ->exists();
 
-        return redirect()->route('books.show', $book)->with('success', 'Empréstimo registrado com sucesso.');
+    if ($emprestimoEmAberto) {
+        return redirect()->route('books.show', $book)
+            ->with('error', 'Este livro já está emprestado e ainda não foi devolvido.');
     }
+
+    // Cria o novo empréstimo
+    Borrowing::create([
+        'user_id'     => $request->user_id,
+        'book_id'     => $book->id,
+        'borrowed_at' => now(),
+    ]);
+
+    return redirect()->route('books.show', $book)
+        ->with('success', 'Empréstimo registrado com sucesso.');
+}
 
     public function returnBook(Borrowing $borrowing)
     {

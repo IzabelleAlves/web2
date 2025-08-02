@@ -31,6 +31,10 @@ class Book extends Model
                 ->withPivot('id', 'borrowed_at', 'returned_at')
                 ->withTimestamps();
 }
+public function isBorrowed()
+{
+    return $this->users()->wherePivot('returned_at', null)->exists();
+}
 
 }
 

@@ -56,5 +56,6 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+Route::delete('/books/{book}/remove-cover', [BookController::class, 'removeCover'])->name('books.removeCover');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
