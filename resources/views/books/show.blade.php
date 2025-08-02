@@ -4,6 +4,20 @@
 <div class="container">
     <h1 class="my-4">Detalhes do Livro</h1>
 
+    {{-- Exibe mensagem de erro --}}
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- Exibe mensagem de sucesso --}}
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <!-- Alerta de Livro já Emprestado -->
     @if($book->isBorrowed())
         <div class="alert alert-warning">

@@ -18,6 +18,8 @@ public function store(Request $request, Book $book)
         'user_id' => 'required|exists:users,id',
     ]);
 
+    $user_id = $request->user_id;
+
     // Verifica se já existe um empréstimo em aberto para este livro
     $emprestimoEmAberto = Borrowing::where('book_id', $book->id)
         ->whereNull('returned_at')
@@ -28,9 +30,19 @@ public function store(Request $request, Book $book)
             ->with('error', 'Este livro já está emprestado e ainda não foi devolvido.');
     }
 
+    // Verifica quantos livros o usuário tem emprestados sem devolução
+    $totalEmprestimosAtivos = Borrowing::where('user_id', $user_id)
+        ->whereNull('returned_at')
+        ->count();
+
+    if ($totalEmprestimosAtivos >= 5) {
+        return redirect()->route('books.show', $book)
+            ->with('error', 'Empréstimo não realizado. Este usuário já possui 5 livros emprestados.');
+    }
+
     // Cria o novo empréstimo
     Borrowing::create([
-        'user_id'     => $request->user_id,
+        'user_id'     => $user_id,
         'book_id'     => $book->id,
         'borrowed_at' => now(),
     ]);
@@ -38,6 +50,7 @@ public function store(Request $request, Book $book)
     return redirect()->route('books.show', $book)
         ->with('success', 'Empréstimo registrado com sucesso.');
 }
+
 
     public function returnBook(Borrowing $borrowing)
     {
