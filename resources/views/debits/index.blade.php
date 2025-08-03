@@ -2,38 +2,49 @@
 
 @section('content')
 <div class="container">
-    <h1>Débitos por Atraso</h1>
+    <h1 class="mb-4">Usuários com Débito</h1>
 
-    @php
-        $hasDebits = false;
-    @endphp
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-    <table class="table">
-        <thead>
+    @if ($borrowings->isEmpty())
+        <p>Nenhum usuário com débito.</p>
+    @else
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Débito (R$)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+<tbody>
+    @foreach ($borrowings as $borrowing)
+        @php
+            $user = $borrowing->user;
+        @endphp
+        @if ($user)
             <tr>
-                <th>Usuário</th>
-                <th>Livro</th>
-                <th>Data de Devolução</th>
-                <th>Multa (R$)</th>
+                <td>{{ $user->name }}</td>
+                <td>{{ $user->email }}</td>
+                <td>{{ number_format($user->debit, 2, ',', '.') }}</td>
+                <td>
+                    <!-- <form method="POST" action="{{ route('admin.debits.clear', $user) }}"> -->
+                        <form method="POST" action="{{ route('debits.clear', $user) }}"></form>
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Confirmar quitação da dívida deste usuário?')">
+                            Quitar multa
+                        </button>
+                    </form>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach($borrowings as $borrowing)
-                @if($borrowing->fine > 0)
-                    @php $hasDebits = true; @endphp
-                    <tr>
-                        <td>{{ $borrowing->user->name }}</td>
-                        <td>{{ $borrowing->book->title }}</td>
-                        <td>{{ \Carbon\Carbon::parse($borrowing->due_date)->format('d/m/Y') }}</td>
-                        <td>{{ number_format($borrowing->fine, 2, ',', '.') }}</td>
-                    </tr>
-                @endif
-            @endforeach
-        </tbody>
-    </table>
+        @endif
+    @endforeach
+</tbody>
 
-    @if(!$hasDebits)
-        <p>Não há débitos no momento.</p>
+        </table>
     @endif
 </div>
 @endsection

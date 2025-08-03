@@ -59,5 +59,5 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::delete('/books/{book}/remove-cover', [BookController::class, 'removeCover'])->name('books.removeCover');
-
+Route::post('/admin/debits/clear/{user}', [DebitController::class, 'clear'])->name('admin.debits.clear');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

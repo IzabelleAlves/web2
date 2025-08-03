@@ -18,7 +18,6 @@ class BorrowingController extends Controller
 
         $user = User::findOrFail($request->user_id);
 
-        // Verifica se o livro já está emprestado
         $emprestimoEmAberto = Borrowing::where('book_id', $book->id)
             ->whereNull('returned_at')
             ->exists();
@@ -28,14 +27,11 @@ class BorrowingController extends Controller
                 ->with('error', 'Este livro já está emprestado e ainda não foi devolvido.');
         }
 
-        // Verifica se o usuário possui débito pendente
         if ($user->debit > 0) {
             return redirect()->route('books.show', $book)
                 ->with('error', 'Empréstimo não realizado. Este usuário possui débito pendente de R$ ' . number_format((float) $user->debit, 2, ',', '.'));
-
         }
 
-        // Verifica se o usuário já tem 5 empréstimos em aberto
         $emprestimosAtivos = Borrowing::where('user_id', $user->id)
             ->whereNull('returned_at')
             ->count();
@@ -45,7 +41,6 @@ class BorrowingController extends Controller
                 ->with('error', 'Empréstimo não realizado. Este usuário já possui 5 livros emprestados.');
         }
 
-        // Cria o empréstimo
         Borrowing::create([
             'user_id' => $user->id,
             'book_id' => $book->id,
@@ -88,15 +83,24 @@ class BorrowingController extends Controller
         return view('users.borrowings', compact('user', 'borrowings'));
     }
 
-    // Interface do bibliotecário para ver e quitar multas
     public function debits()
     {
+        // Adiciona proteção explícita
+        if (!auth()->user()->isAdmin() && !auth()->user()->isBibliotecario()) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $usuariosComDebito = User::where('debit', '>', 0)->get();
         return view('admin.debits', compact('usuariosComDebito'));
     }
 
     public function zerarDebito(User $user)
     {
+        // Adiciona proteção explícita
+        if (!auth()->user()->isAdmin() && !auth()->user()->isBibliotecario()) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $user->debit = 0;
         $user->save();
 

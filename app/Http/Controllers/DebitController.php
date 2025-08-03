@@ -16,7 +16,6 @@ class DebitController extends Controller
             $today = Carbon::now();
             $dueDate = Carbon::parse($borrowing->borrowed_at)->addDays(15);
 
-
             if ($today->greaterThan($dueDate)) {
                 $daysLate = $today->diffInDays($dueDate);
                 $borrowing->fine = $daysLate * 0.50;
